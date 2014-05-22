@@ -6,7 +6,7 @@ One or more custom commands we use a bunch at CFPB to manage our site.
 
 Just one for now
 
-- [Taxonomy migration ()](#taxonomy-migration)
+- [Taxonomy migration](#taxonomy-migration)
 
 ## Taxonomy Migration
 
