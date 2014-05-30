@@ -35,18 +35,48 @@ class Migrate_Command extends WP_CLI_Command {
         extract( $assoc_args );
         $message = "Will migrate all $from to $to";
         $args = array('posts_per_page' => -1);
+        $include = isset($include) ? $include : 'all';
         if ( $include != 'all' ) {
             $args['include'] = $include;
-            $message .= " for post(s) {$include}.\n\n";
-            print_r($message);
+            $message .= " for post(s) {$include}";
+        }
+
+        if ( isset( $exclude ) ) {
+            $args['exclude'] = $exclude;
+            $message .= " and excluding {$exclude}";
         }
         if ( isset( $post_type ) ) {
             $args['post_type'] = $post_type;
+            $message .= " of the {$post_type} post type";
         } else {
             $args['post_type'] = 'post';
         }
-        $posts = get_posts($args);
+        if ( isset($before) ) {
+            $args['date_query'] = array(
+                'before' => $before,
+            );
+            $message .= " published before {$before}";
+        }
+        if ( isset($after) ) {
+            $args['date_query'] = array(
+                'after' => $after,
+            );
+            if ( array_key_exists('before', $args['date_query']) ) {
+                $message .= " and after {$after}";
+            } else {
+                $message .= " published after {$after}";
+            }
+        }
+        // unimplemented stuff, keep this before get_posts, for now
+        if ( isset($terms) ) {
+            $message .= " against only these terms: $terms";
+            exit('Unimplemented' );
+        }
 
+        // start the action!
+        print_r("{$message}.\n");
+        $posts = get_posts($args);
+        $count = count($posts);
         $set = array();
         foreach ( $posts as $p ) {
             $terms = wp_get_post_terms( $p->ID, $from );
@@ -56,38 +86,14 @@ class Migrate_Command extends WP_CLI_Command {
                     $new_term = get_term_by('slug', $t->slug, $to);
                     array_push($set, $new_term->slug);
                 } else {
-                    array_push($set, $new_term->term_id);
+                    array_push($set, $new_term[term_id]);
                 }
             }
-            print_r("Setting terms for {$to} on {$args['post_type']} #{$p->ID}\n");
+            $message = "Setting terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
+            print_r($message);
             $new = wp_set_object_terms( $p->ID, $set, $to );
         }
-        // var_dump($terms);
-        // var_dump($new);
-        if ( isset( $post_type ) ) {
-            $message .= " in the $post_type post type";
-            exit('Unimplemented' );
-        }
-        if ( isset( $exclude ) ) {
-            $message .= " except for posts $exclude";
-            exit('Unimplemented' );
-        }
-        if ( isset( $after ) && isset( $before ) ) {
-            $message .= " between $before and $after";
-            exit('Unimplemented' );
-        } elseif ( isset( $after ) ) {
-            $message .= " after $after";
-            exit('Unimplemented' );
-        } elseif ( isset( $before ) ) {
-            $message .= " before $before";
-            exit('Unimplemented' );
-        }
-        if ( isset($terms) ) {
-            $message .= " against only these terms: $terms";
-            exit('Unimplemented' );
-        }
-
-        $message .= ".";
+        $message .= "All {$from} successfully migrated to {$to} for {$count} {$args['post_type']}s. You did it!";
         WP_CLI::success( $message );
     }
 }

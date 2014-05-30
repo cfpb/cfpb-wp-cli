@@ -17,10 +17,10 @@ Migrate taxonomies like this:
 It takes the following optional argument:
 - `--post_type` a comma separated list of all post types to migrate
 - `--exclude` a comma separated list of any post id to exclude
-- `--newer_than` a date string formatted like 2013-01-31 will only run the
+- `--after` a date string formatted like 2013-01-31 will only run the
     command on posts newer than January 31, 2013
-- `--older_than` opposite of newer than
-- `--term` a comma separated list of specific terms to migrate
+- `--before` opposite of newer than
+- `--term` a comma separated list of specific terms to migrate (currently unimplemented)
 
 The command will loop through each post and create new taxonomy-term
 relationships for each on the target taxonomy. If post 'foo' had tags 'bar' and
