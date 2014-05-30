@@ -12,7 +12,7 @@ Just one for now
 
 Migrate taxonomies like this:
 
-`wp taxonomy migrate <from> <to>`
+`wp migrate taxonomy <from> <to>`
 
 It takes the following optional argument:
 - `--post_type` a comma separated list of all post types to migrate
@@ -27,9 +27,9 @@ relationships for each on the target taxonomy. If post 'foo' had tags 'bar' and
 'baz' it will now have groups 'bar' and 'baz' as well
 
 ### Examples
-`wp taxonomy migrate tag group` will migrate taxonomy-term relationships for
+`wp migrate taxonomy tag group` will migrate taxonomy-term relationships for
 tags on all posts in the WordPress database to a taxonomy called group
-`wp taxonomy migrate tag group --post_type=post` will migrate the tags on only
+`wp migrate taxonomy tag group --post_type=post` will migrate the tags on only
 posts and exclude all other taxonomies with tags
-`wp taxonomy migrate tag group --exclude=1,2,3,5,8` will exclude posts 1, 2, 3,
+`wp migrate taxonomy tag group --exclude=1,2,3,5,8` will exclude posts 1, 2, 3,
 5, and 8 from the migration.
