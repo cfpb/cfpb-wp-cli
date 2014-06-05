@@ -3,12 +3,19 @@ class Migrate_Command extends WP_CLI_Command {
 
     /**
     *
-    * Manipulates taxonomies
+    * Migrates meta data
     *
+    * @todo  [--terms=<terms>]
+    *
+    **/
+    /**
+    * @subcommand taxonomy
+    * 
     * ## Options
     *
     * <from>
     * : The taxonomy to migrate from
+    * 
     * <to>
     * : The taxonomy to migrate to
     *
@@ -16,20 +23,10 @@ class Migrate_Command extends WP_CLI_Command {
     *
     *     wp migrate taxonomy tag group
     *
-    * @synopsis <from> <to> --include=<bar> [--post_type=<foo>]
-    * @todo [--post_type=<foo>] [--exclude=<bar>] [--after=<date>] [--before=<date>] [--terms=<terms>]
-    *
-    **/
-    /**
-    * @subcommand taxonomy
-    * @alias m
-    *
+    * @synopsis <from> <to> --include=<bar> [--post_type=<foo>] [--post_type=<foo>] [--exclude=<bar>] [--after=<date>] [--before=<date>]
+    * 
     **/
     public function taxonomy( $args, $assoc_args ) {
-        if ( ! isset( $args[0] ) || ! isset( $args[1] ) ) {
-            $message = "\nYou must specify taxonomies to migrate from and to. \n\n Example: wp migrate taxonomy category tag. \n\n";
-            exit($message);
-        }
         $from = $args[0];
         $to = $args[1];
         extract( $assoc_args );
@@ -98,6 +95,17 @@ class Migrate_Command extends WP_CLI_Command {
         }
         $message .= "All {$from} successfully migrated to {$to} for {$count} {$args['post_type']}s. You did it!";
         WP_CLI::success( $message );
+    }
+
+    /**
+    * @subcommand author
+    *
+    * Migrates author names to a taxonomy.
+    *
+    * 
+    **/
+    public function author() {
+
     }
 }
 
