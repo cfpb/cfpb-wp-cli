@@ -10,6 +10,6 @@
  */
 
 if ( defined('WP_CLI') && WP_CLI ) {
-    include __DIR__ . '/taxonomy.php';
+    include __DIR__ . '/migrate.php';
 }
 ?>
