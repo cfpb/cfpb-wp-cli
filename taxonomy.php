@@ -93,6 +93,8 @@ class Migrate_Command extends WP_CLI_Command {
             $message = "Setting terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
             print_r($message);
             $new = wp_set_object_terms( $p->ID, $set, $to );
+            // clear all those posts out of $set to tee up the next 
+            $set = array();
         }
         $message .= "All {$from} successfully migrated to {$to} for {$count} {$args['post_type']}s. You did it!";
         WP_CLI::success( $message );
