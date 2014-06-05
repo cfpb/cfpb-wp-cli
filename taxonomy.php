@@ -86,7 +86,8 @@ class Migrate_Command extends WP_CLI_Command {
                     $new_term = get_term_by('slug', $t->slug, $to);
                     array_push($set, $new_term->slug);
                 } else {
-                    array_push($set, $new_term[term_id]);
+                    $added_term = get_term( $new_term['term_id'], $to, $output = OBJECT, $filter = 'raw' );
+                    array_push($set, $added_term->slug);
                 }
             }
             $message = "Setting terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
