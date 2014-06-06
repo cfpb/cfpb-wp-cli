@@ -1,15 +1,15 @@
 <?php
+/**
+* Migrates meta data
+*
+* @subcommand taxonomy
+*
+**/
 class Migrate_Command extends WP_CLI_Command {
 
     /**
     *
-    * Migrates meta data
-    *
-    * @todo  [--terms=<terms>]
-    *
-    **/
-    /**
-    * @subcommand taxonomy
+    * Migrates terms in one taxonomy to another. Useful for when you decide you want tags instead of categories.
     * 
     * ## Options
     *
@@ -22,15 +22,13 @@ class Migrate_Command extends WP_CLI_Command {
     * ## Exmples
     *
     *     wp migrate taxonomy tag group
-    *
-    * @synopsis <from> <to> --include=<bar> [--post_type=<foo>] [--post_type=<foo>] [--exclude=<bar>] [--after=<date>] [--before=<date>]
+    * @synopsis <from> <to> [--include=<bar>] [--exclude=<foo>] [--post_type=<foo>] [--before=<bar>] [--after=<date>]
+    * 
+    * @todo  [--terms=<terms>]
     * 
     **/
-    public function taxonomy( $args, $assoc_args ) {
-        $from = $args[0];
-        $to = $args[1];
-        extract( $assoc_args );
-        $message = "Will migrate all $from to $to";
+    protected function get_specified_posts($assoc_args) {
+        extract($assoc_args);
         $args = array('posts_per_page' => -1);
         $include = isset($include) ? $include : 'all';
         if ( $include != 'all' ) {
@@ -73,6 +71,20 @@ class Migrate_Command extends WP_CLI_Command {
         // start the action!
         print_r("{$message}.\n");
         $posts = get_posts($args);
+        return array( 
+            'message' => $message, 
+            'posts' => $posts 
+        );
+    }
+    public function taxonomy( $args, $assoc_args ) {
+        $from = $args[0];
+        $to = $args[1];
+        extract( $assoc_args );
+        $preamble = "Will migrate all $from to $to";
+        $get_posts = $this->get_specified_posts( $assoc_args );
+        extract($get_posts);
+        $message = "{$preamble} {$message}";
+
         $count = count($posts);
         $set = array();
         foreach ( $posts as $p ) {
@@ -102,10 +114,17 @@ class Migrate_Command extends WP_CLI_Command {
     *
     * Migrates author names to a taxonomy.
     *
+    * ## Options
+    * <type>
+    * : Acceptable: taxonomy or custom_field (expects a taxonomy called Author or will use custom_field key "Author")
+    * 
+    * @synopsis <type> 
+    * @todo  [--posts=<foo>] [post_types=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>]
     * 
     **/
-    public function author() {
-
+    public function author( $args, $assoc_args ) {
+        $type = $args[0];
+        extract($assoc_args);
     }
 }
 
