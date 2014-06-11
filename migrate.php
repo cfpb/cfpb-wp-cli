@@ -1,11 +1,12 @@
 <?php
+namespace CFPB;
 /**
 * Migrates meta data
 *
 * @subcommand taxonomy
 *
 **/
-class Migrate_Command extends WP_CLI_Command {
+class Migrate_Command extends CLI_Common {
 
     /**
     *
@@ -27,59 +28,6 @@ class Migrate_Command extends WP_CLI_Command {
     * @todo  [--terms=<terms>]
     * 
     **/
-    protected function get_specified_posts($assoc_args) {
-        extract($assoc_args);
-        $args = array('posts_per_page' => -1);
-        $include = isset($include) ? $include : 'all';
-        $message = '';
-        if ( $include != 'all' ) {
-            $args['include'] = $include;
-            $message .= "for post(s) {$include}";
-        }
-
-        if ( isset( $exclude ) ) {
-            $args['exclude'] = $exclude;
-            $message .= "excluding {$exclude}";
-        }
-        if ( isset( $post_type ) ) {
-            $args['post_type'] = $post_type;
-            $message .= "of the {$post_type} post type";
-        } else {
-            $args['post_type'] = 'post';
-        }
-        if ( isset($before) ) {
-            $args['date_query'] = array(
-                'before' => $before,
-            );
-            $message .= "published before {$before}";
-        }
-        if ( isset($after) ) {
-            $args['date_query'] = array(
-                'after' => $after,
-            );
-            if ( array_key_exists('before', $args['date_query']) ) {
-                $message .= "and after {$after}";
-            } else {
-                $message .= "published after {$after}";
-            }
-        }
-        // unimplemented stuff, keep this before get_posts, for now
-        if ( isset($terms) ) {
-            $message .= "against only these terms: $terms";
-            exit('Unimplemented' );
-        }
-        if ( ! isset( $message ) ) {
-            $message = "all posts";
-        }
-
-        // start the action!
-        $posts = get_posts($args);
-        return array( 
-            'message' => $message, 
-            'posts' => $posts, 
-            'args' => $args,
-        );
-    }
     public function taxonomy( $args, $assoc_args ) {
         if ( empty($args) ) {
             exit('Invalid entry.');
@@ -115,7 +63,7 @@ class Migrate_Command extends WP_CLI_Command {
             $set = array();
         }
         $message = "All {$from} successfully migrated to {$to} for {$count} {$args['post_type']}s. You did it!";
-        WP_CLI::success( $message );
+        \WP_CLI::success( $message );
     }
 
     /**
@@ -127,7 +75,7 @@ class Migrate_Command extends WP_CLI_Command {
     * <type>
     * : Acceptable: taxonomy or custom_field (expects a taxonomy called Author or will use custom_field key "custom_author")
     * 
-    * @synopsis [<type>] [--include=<foo>] [--exclude=<foo>] [--post_types=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>]
+    * @synopsis [<type>] [--include=<foo>] [--exclude=<foo>] [--post_type=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>]
     * @todo
     * 
     **/
@@ -149,6 +97,8 @@ class Migrate_Command extends WP_CLI_Command {
         $get_posts = $this->get_specified_posts($assoc_args);
         $message = $get_posts['message'];
         $posts = $get_posts['posts'];
+        $args = $get_posts['args'];
+        $count = count($posts);
         print_r("$preamble $message.\n");
         foreach ( $posts as $p ) {
             $authorID = $p->post_author;
@@ -157,42 +107,8 @@ class Migrate_Command extends WP_CLI_Command {
             $this->set_author_terms($p->ID, $terms);
             wp_set_object_terms( $p->ID, $terms, 'author', $append = false );
         }
-    }
-
-    private function set_author_terms($object_id, $terms) {
-        foreach ( $terms as $k => $a ) {
-            if ( has_term($a, 'author', $object_id ) ) {
-                unset($terms, $k);
-            }
-            if ( !empty( $terms ) ) {
-                wp_set_object_terms( $object_id, $terms, 'author', $append = false );
-            }
-        }
-    }
-
-    private function split_by_comma_or_and($string) {
-        $authors = array();
-        $explosion = explode(', ', $string);
-        $count = count($explosion);
-        if ( $count == 1 && strstr($string, ' and ') ) {
-            $index = strpos($string, ' and ');
-            array_push($authors, substr($string, 0, $index-1));
-            array_push($authors, substr($string, $index+4));
-        } elseif ( $count > 1 ) {
-            foreach ( $explosion as $e ) {
-                if ( strstr($e, ' and ') ) {
-                    $index = strpos($e, ' and ');
-                    array_push($authors, 0, substr($e, 0, $index));
-                    array_push($authors, substr($e, $index+5));
-                } else {
-                    array_push($authors, $e);
-                }
-            }
-        } else {
-            array_push($authors, $string);
-        }
-        return $authors;
+        \WP_CLI::success("All authors migrated for {$count} on {$args['post_type']}s. You did it!");
     }
 }
 
-WP_CLI::add_command( 'migrate', 'Migrate_Command' );
+\WP_CLI::add_command( 'migrate', '\CFPB\Migrate_Command' );

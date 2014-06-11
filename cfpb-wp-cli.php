@@ -10,6 +10,8 @@
  */
 
 if ( defined('WP_CLI') && WP_CLI ) {
+	include __DIR__ . '/library.php';
     include __DIR__ . '/migrate.php';
+    include __DIR__ . '/randomize.php';
 }
 ?>
