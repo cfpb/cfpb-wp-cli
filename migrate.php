@@ -73,7 +73,7 @@ class Migrate_Command extends CLI_Common {
     *
     * ## Options
     * <type>
-    * : Acceptable: taxonomy or custom_field (expects a taxonomy called Author or will use custom_field key "custom_author")
+    * : Acceptable: taxonomy or custom_field (expects a taxonomy called author or will use custom_field key "custom_author")
     * 
     * @synopsis [<type>] [--include=<foo>] [--exclude=<foo>] [--post_type=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>]
     * @todo
