@@ -48,7 +48,7 @@ class Migrate_Command extends CLI_Common {
             $terms = wp_get_post_terms( $p->ID, $from );
             foreach ( $terms as $t ) {
                 $new_term = wp_insert_term( $t->name, $to, array( 'slug' => $t->slug ) );
-                if ( $new_term instanceof WP_Error ) {
+                if ( $new_term instanceof \WP_Error ) {
                     $new_term = get_term_by('slug', $t->slug, $from);
                     array_push($set, $new_term->slug);
                 } else {
@@ -56,9 +56,11 @@ class Migrate_Command extends CLI_Common {
                     array_push($set, $added_term->slug);
                 }
             }
-            $message = "Setting terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
+            $n = count($set);
+            $message = "Setting {$n} terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
             print_r($message);
             $new = wp_set_object_terms( $p->ID, $set, $to );
+            var_dump($new);
             // clear all those posts out of $set to tee up the next 
             $set = array();
         }
