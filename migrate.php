@@ -20,10 +20,12 @@ class Migrate_Command extends CLI_Common {
     * <to>
     * : The taxonomy to migrate to
     *
+    * [--ignore_term]
+    * : Comma separate list of terms in <from> to ignore in the migration to <to>
     * ## Exmples
     *
     *     wp migrate taxonomy tag group
-    * @synopsis <from> <to> [--include=<bar>] [--exclude=<foo>] [--post_type=<foo>] [--before=<bar>] [--after=<date>]
+    * @synopsis <from> <to> [--include=<bar>] [--exclude=<foo>] [--post_type=<foo>] [--before=<bar>] [--after=<date>] [--ignore_term=<foo>]
     * 
     * @todo  [--terms=<terms>]
     * 
@@ -36,7 +38,7 @@ class Migrate_Command extends CLI_Common {
         $to = $args[1];
         extract( $assoc_args );
         $preamble = "Will migrate all $from to $to";
-        $get_posts = $this->get_specified_posts( $assoc_args );
+        $get_posts = $this->get_specified_posts( $assoc_args, $args );
         $message = $get_posts['message'];
         $posts = $get_posts['posts'];
         $args = $get_posts['args'];
@@ -60,7 +62,6 @@ class Migrate_Command extends CLI_Common {
             $message = "Setting {$n} terms for {$to} on {$args['post_type']} #{$p->ID}.\n";
             print_r($message);
             $new = wp_set_object_terms( $p->ID, $set, $to );
-            var_dump($new);
             // clear all those posts out of $set to tee up the next 
             $set = array();
         }
@@ -77,13 +78,13 @@ class Migrate_Command extends CLI_Common {
     * <type>
     * : Acceptable: taxonomy or custom_field (expects a taxonomy called author or will use custom_field key "custom_author")
     * 
-    * @synopsis [<type>] [--include=<foo>] [--exclude=<foo>] [--post_type=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>]
+    * @synopsis [<type>] [--include=<foo>] [--exclude=<foo>] [--post_type=<foo>] [--authors=<foo>] [--before=<foo>] [--after=<foo>] [--ignore_term] [--dry-run]
     * @todo
     * 
     **/
     public function author( $args, $assoc_args ) {
         if ( empty($args) && taxonomy_exists( 'author' ) ) {
-            $to = 'author taxonomy';
+            $to = 'the author taxonomy';
             $type = get_taxonomy( 'author' );
         } elseif ( is_array($args) && taxonomy_exists($args[0]) ) {
             $to = "taxonomy '{$args[0]}'";
@@ -102,14 +103,18 @@ class Migrate_Command extends CLI_Common {
         $args = $get_posts['args'];
         $count = count($posts);
         print_r("$preamble $message.\n");
-        foreach ( $posts as $p ) {
-            $authorID = $p->post_author;
-            $author_name = get_the_author_meta('display_name', $authorID );
-            $terms = $this->split_by_comma_or_and($author_name);
-            $this->set_author_terms($p->ID, $terms);
-            wp_set_object_terms( $p->ID, $terms, 'author', $append = false );
+        if ( isset($assoc_args['dry-run']) ) {
+            \WP_CLI::success("If this were not a dry run, all authors would migrate for {$count} on {$args['post_type']}s.");
+        } else {
+            foreach ( $posts as $p ) {
+                $authorID = $p->post_author;
+                $author_name = get_the_author_meta('display_name', $authorID );
+                $terms = $this->split_by_comma_or_and($author_name);
+                $this->set_author_terms($p->ID, $terms);
+                wp_set_object_terms( $p->ID, $terms, 'author', $append = false );
+            }
+            \WP_CLI::success("All authors migrated for {$count} on {$args['post_type']}s. You did it!");
         }
-        \WP_CLI::success("All authors migrated for {$count} on {$args['post_type']}s. You did it!");
     }
 }
 
