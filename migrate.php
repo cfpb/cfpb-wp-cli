@@ -85,10 +85,10 @@ class Migrate_Command extends CLI_Common {
     public function author( $args, $assoc_args ) {
         if ( empty($args) && taxonomy_exists( 'author' ) ) {
             $to = 'the author taxonomy';
-            $type = get_taxonomy( 'author' );
+            $type = true;
         } elseif ( is_array($args) && taxonomy_exists($args[0]) ) {
             $to = "taxonomy '{$args[0]}'";
-            $type = get_taxonomy( $args[0] );
+            $type = true;
         } elseif ( isset($args) ) {
             $to = "custom field '{$args[0]}'";
             $type = $args[0];
@@ -110,8 +110,11 @@ class Migrate_Command extends CLI_Common {
                 $authorID = $p->post_author;
                 $author_name = get_the_author_meta('display_name', $authorID );
                 $terms = $this->split_by_comma_or_and($author_name);
-                $this->set_author_terms($p->ID, $terms);
-                wp_set_object_terms( $p->ID, $terms, 'author', $append = false );
+                if ( $type === true ) {
+                    $this->set_author_terms($p->ID, $terms);
+                } else {
+                    $this->set_author_as_meta($p->ID, $terms, $type);
+                }
             }
             \WP_CLI::success("All authors migrated for {$count} on {$args['post_type']}s. You did it!");
         }

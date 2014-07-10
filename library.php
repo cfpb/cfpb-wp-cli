@@ -2,11 +2,10 @@
 namespace CFPB;
 class CLI_Common extends \WP_CLI_COMMAND {
 
-	protected function get_specified_posts($assoc_args, $args = array()) {
-        extract($assoc_args);
+	protected function get_specified_posts($assoc_args) {
         $args = array('posts_per_page' => -1);
-        $include = isset($include) ? $include : 'all';
-        $exclude = isset($exclude) ? $exclude : null;
+        $include = isset($assoc_args['include']) ? $assoc_args['include'] : 'all';
+        $exclude = isset($assoc_args['exclude']) ? $assoc_args['exclude'] : null;
         $message = '';
         if ( $include != 'all' ) {
             $args['include'] = $include;
@@ -15,14 +14,14 @@ class CLI_Common extends \WP_CLI_COMMAND {
         	$message .= "for all posts";
         }
 
-        if ( isset( $exclude ) ) {
-            $args['exclude'] = $exclude;
-            $message .= "excluding {$exclude}";
+        if ( isset( $assoc_args['exclude'] ) ) {
+            $args['exclude'] = $assoc_args['exclude'];
+            $message .= "excluding {$assoc_args['exclude']}";
         }
 
-        if ( isset( $post_type ) ) {
-            $args['post_type'] = $post_type;
-            $message .= " of the {$post_type} post type";
+        if ( isset( $assoc_args['post_type'] ) ) {
+            $args['post_type'] = $assoc_args['post_type'];
+            $message .= " of the {$assoc_args['post_type']} post type";
         } else {
             $args['post_type'] = 'post';
         }
@@ -48,25 +47,25 @@ class CLI_Common extends \WP_CLI_COMMAND {
             }
         }
 
-        if ( isset($before) ) {
+        if ( isset($assoc_args['before']) ) {
             $args['date_query'] = array(
-                'before' => $before,
+                'before' => $assoc_args['before'],
             );
-            $message .= "published before {$before}";
+            $message .= "published before {$assoc_args['before']}";
         }
-        if ( isset($after) ) {
+        if ( isset($assoc_args['after']) ) {
             $args['date_query'] = array(
-                'after' => $after,
+                'after' => $assoc_args['after'],
             );
             if ( array_key_exists('before', $args['date_query']) ) {
-                $message .= "and after {$after}";
+                $message .= "and after {$assoc_args['after']}";
             } else {
-                $message .= "published after {$after}";
+                $message .= "published after {$assoc_args['after']}";
             }
         }
         // unimplemented stuff, keep this before get_posts, for now
-        if ( isset($terms) ) {
-            $message .= "against only these terms: $terms";
+        if ( isset($assoc_args['terms']) ) {
+            $message .= "against only these terms: {$assoc_args['terms']}";
             exit('Unimplemented' );
         }
         if ( ! isset( $message ) ) {
@@ -125,6 +124,12 @@ class CLI_Common extends \WP_CLI_COMMAND {
             if ( !empty( $terms ) ) {
                 wp_set_object_terms( $object_id, $terms, 'author', $append = false );
             }
+        }
+    }
+
+    protected function set_author_as_meta($post_id, $terms, $meta_key) {
+        foreach ( $terms as $meta_value ) {
+            add_post_meta( $post_id, $meta_key, $meta_value, $unique = false );
         }
     }
 
