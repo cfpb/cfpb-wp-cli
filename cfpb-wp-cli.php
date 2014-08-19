@@ -4,8 +4,8 @@
  * Plugin URI: http://github.com/CFPB/cfpb-wp-cli
  * Description: A collection of wp-cli plugins we use at CFPB
  * Version: 1.0
- * Author: Greg Boone
- * Author URI: greg.harmsboone.org
+ * Author: Greg Boone, CFPB
+ * Author URI: https://github.com/cfpb
  * License: Public Domain Work of the Federal Government
  */
 
