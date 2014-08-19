@@ -2,12 +2,23 @@
 
 One or more custom commands we use a bunch at CFPB to manage our site.
 
+## Installation
+
+Install this as a plugin to your WordPress site. Then, if you have WP-CLI 
+installed, you'll have access to the commands below.
+
+## Requirements
+
+WordPress 3.7 or higher running on PHP 5.3 or higher.
+
 ## Commands
 
-Just one for now
+Just two for now:
 
-- [Taxonomy migration](#taxonomy-migration)
-- [Author migration](#author-migration)
+- Migration
+    - [Taxonomy migration](#taxonomy-migration)
+    - [Author migration](#author-migration)
+- [Randomize taxonomy](#randomize)
 
 ## Taxonomy Migration
 
@@ -69,3 +80,17 @@ the post type `custom`
 migrate authors on all posts in the "custom" post type that do not have categories
 featured or sticky
 
+
+## Randomize
+
+Allows you to assign random taxonomy terms to a post or set of posts. 
+
+Usage: `wp randomize taxonomy category`
+
+By default all objects of the 'post' post type will be randomized, use the
+`--post_type` flag to target pages or a custom post type. Use the `--include` 
+and `--exclude` flags to filter or ignore specific object IDs and the `--before`
+and `--after` flags to specify a date range. Also, optionally pass `--terms` as
+a list of terms you want to use for the randomization. Failing that, if terms exist 
+in the target taxonomy, those terms will be used. If not, a string of 6 words 
+generated randomly will be used for the randomization.
