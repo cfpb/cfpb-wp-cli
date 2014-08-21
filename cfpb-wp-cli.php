@@ -5,7 +5,7 @@
  * Description: A collection of wp-cli plugins we use at CFPB
  * Version: 1.0
  * Author: Greg Boone, CFPB
- * Author URI: https://github.com/cfpb
+ * Author URI: https://cfpb.github.io/
  * License: Public Domain
  */
 
