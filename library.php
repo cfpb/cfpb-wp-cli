@@ -116,13 +116,13 @@ class CLI_Common extends \WP_CLI_COMMAND {
         return $posts;
     }
 
-    protected function set_author_terms($object_id, $terms) {
+    protected function set_author_terms($object_id, $terms, $taxonomy = 'author') {
         foreach ( $terms as $k => $a ) {
-            if ( has_term($a, 'author', $object_id ) ) {
+            if ( has_term($a, $taxonomy, $object_id ) ) {
                 unset($terms, $k);
             }
             if ( !empty( $terms ) ) {
-                wp_set_object_terms( $object_id, $terms, 'author', $append = false );
+                wp_set_object_terms( $object_id, $terms, $taxonomy, $append = false );
             }
         }
     }

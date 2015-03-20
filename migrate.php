@@ -86,9 +86,11 @@ class Migrate_Command extends CLI_Common {
         if ( empty($args) && taxonomy_exists( 'author' ) ) {
             $to = 'the author taxonomy';
             $type = true;
+            $taxonomy = 'author';
         } elseif ( is_array($args) && taxonomy_exists($args[0]) ) {
             $to = "taxonomy '{$args[0]}'";
             $type = true;
+            $taxonomy = $args[0];
         } elseif ( isset($args) ) {
             $to = "custom field '{$args[0]}'";
             $type = $args[0];
@@ -111,7 +113,7 @@ class Migrate_Command extends CLI_Common {
                 $author_name = get_the_author_meta('display_name', $authorID );
                 $terms = $this->split_by_comma_or_and($author_name);
                 if ( $type === true ) {
-                    $this->set_author_terms($p->ID, $terms);
+                    $this->set_author_terms($p->ID, $terms, $taxonomy);
                 } else {
                     $this->set_author_as_meta($p->ID, $terms, $type);
                 }
