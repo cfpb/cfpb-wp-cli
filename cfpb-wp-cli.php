@@ -3,7 +3,7 @@
  * Plugin Name: CFPB WP CLI Commands
  * Plugin URI: https://github.com/cfpb/cfpb-wp-cli
  * Description: A collection of wp-cli plugins we use at CFPB
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Greg Boone, CFPB
  * Author URI: https://cfpb.github.io/
  * License: Public Domain
