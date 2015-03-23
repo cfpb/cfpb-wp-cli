@@ -1,6 +1,6 @@
 # CFPB WP CLI Commands
 
-One or more custom commands we use a bunch at CFPB to manage our site.
+Custom commands we use at CFPB to manage our site.
 
 ## Installation
 
